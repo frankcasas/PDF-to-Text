@@ -1,0 +1,139 @@
+#!/usr/bin/env python3
+
+import logging
+from pathlib import Path
+import fitz  # PyMuPDF
+from pypdf import PdfReader
+from tqdm import tqdm
+import sys
+
+MIN_TEXT_THRESHOLD = 50
+LOG_FILE = "pdf_processing.log"
+
+# =========================
+# Logging Setup
+# =========================
+
+logging.basicConfig(
+    filename=LOG_FILE,
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
+
+# =========================
+# Extraction Engines
+# =========================
+
+def extract_with_pymupdf(pdf_path: Path) -> str:
+    text_chunks = []
+    with fitz.open(pdf_path) as doc:
+        for page in doc:
+            text_chunks.append(page.get_text("text"))
+    return "\n".join(text_chunks)
+
+
+def extract_with_pypdf(pdf_path: Path) -> str:
+    text = ""
+    reader = PdfReader(str(pdf_path))
+    for page in reader.pages:
+        page_text = page.extract_text()
+        if page_text:
+            text += page_text
+    return text
+
+
+def extract_text(pdf_path: Path) -> str:
+    text = extract_with_pymupdf(pdf_path)
+
+    if len(text.strip()) < MIN_TEXT_THRESHOLD:
+        logging.info(f"Fallback to pypdf: {pdf_path}")
+        text = extract_with_pypdf(pdf_path)
+
+    return text
+
+
+# =========================
+# Processing Logic
+# =========================
+
+def process_directory(input_dir: Path, output_dir: Path):
+    pdf_files = list(input_dir.rglob("*.pdf"))
+    print(f"\nFound {len(pdf_files)} PDF files.\n")
+
+    for pdf_file in tqdm(pdf_files, desc="Processing PDFs"):
+        try:
+            text = extract_text(pdf_file)
+
+            relative_path = pdf_file.relative_to(input_dir)
+            output_file = output_dir / relative_path.with_suffix(".txt")
+            output_file.parent.mkdir(parents=True, exist_ok=True)
+
+            output_file.write_text(text, encoding="utf-8")
+
+        except Exception as e:
+            logging.error(f"Failed {pdf_file}: {e}")
+
+    print("\nProcessing complete.")
+    print(f"Output saved to: {output_dir.resolve()}")
+
+
+# =========================
+# Interactive Interface
+# =========================
+
+def prompt_for_directory(prompt_text):
+    while True:
+        path_input = input(prompt_text).strip().strip('"')
+
+        path = Path(path_input)
+
+        if path.exists():
+            return path
+
+        print("Path does not exist. Please try again.\n")
+
+
+def prompt_for_output_directory(prompt_text):
+    while True:
+        path_input = input(prompt_text).strip().strip('"')
+        path = Path(path_input)
+
+        if path.exists():
+            return path
+
+        create = input("Directory does not exist. Create it? (y/n): ").lower()
+        if create == "y":
+            try:
+                path.mkdir(parents=True, exist_ok=True)
+                print("Directory created.\n")
+                return path
+            except Exception as e:
+                print(f"Could not create directory: {e}")
+        else:
+            print("Please enter another directory.\n")
+
+
+def main():
+    print("\n=== PDF to Text Converter (Interactive) ===\n")
+
+    input_dir = prompt_for_directory("Enter input directory path: ")
+
+    if not input_dir.is_dir():
+        print("Error: Input must be a directory.")
+        sys.exit(1)
+
+    output_dir = prompt_for_output_directory("Enter output directory path: ")
+
+    confirm = input(
+        f"\nProcess PDFs from:\n{input_dir.resolve()}\n\nSave output to:\n{output_dir.resolve()}\n\nProceed? (y/n): "
+    ).lower()
+
+    if confirm != "y":
+        print("Operation cancelled.")
+        sys.exit(0)
+
+    process_directory(input_dir, output_dir)
+
+
+if __name__ == "__main__":
+    main()
