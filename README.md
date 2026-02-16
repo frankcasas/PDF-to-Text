@@ -5,12 +5,12 @@ Python CLI tool that recursively converts PDF files in a directory into plain te
 
 A production-ready Python CLI tool that recursively converts PDF files in a directory into plain text files.
 
-✅ Cross-platform (Windows, Linux, macOS)  
-✅ No system-level dependencies (pip-only)  
-✅ Recursive directory processing  
-✅ Preserves folder structure  
-✅ Automatic fallback between extraction engines  
-✅ Logging included  
+ Cross-platform (Windows, Linux, macOS)  
+ No system-level dependencies (pip-only)  
+ Recursive directory processing  
+ Preserves folder structure  
+ Automatic fallback between extraction engines  
+ Logging included  
 
 ---
 
@@ -50,9 +50,14 @@ The script requires:
 --output → Directory where text files will be saved
 
 Example
+```bash
 python pdf_to_text.py --input ./pdfs --output ./text_output
+```
+
 Windows Example
+```bash
 python pdf_to_text.py --input "C:\Users\me\Documents\pdfs" --output "C:\Users\me\Documents\output"
+```
  How It Works
 The script recursively scans the input directory for .pdf files.
 
@@ -84,7 +89,7 @@ Image-only (scanned) PDFs are not supported in this version.
 
 OCR requires an external engine (e.g., Tesseract) and is intentionally not included to keep the project dependency-free.
 
-📄 requirements.txt
+ requirements.txt
 pymupdf
 pypdf
 tqdm
