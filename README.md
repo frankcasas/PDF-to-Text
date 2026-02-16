@@ -67,29 +67,34 @@ The original directory structure is preserved inside the output folder.
 
 Example
 Input structure:
-
+```markdown
 pdfs/
 ├── file1.pdf
 └── reports/
     └── report1.pdf
+```
 Output structure:
-
+```markdown
 text_output/
 ├── file1.txt
 └── reports/
     └── report1.txt
+```
  Logging
+ 
 All errors and fallback events are written to:
-
+```lua
 pdf_processing.log
+```
 This file is automatically created in the project root.
 
  Limitations
 Image-only (scanned) PDFs are not supported in this version.
 
 OCR requires an external engine (e.g., Tesseract) and is intentionally not included to keep the project dependency-free.
-
+```nginx
  requirements.txt
 pymupdf
 pypdf
 tqdm
+```
