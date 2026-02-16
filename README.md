@@ -92,8 +92,9 @@ This file is automatically created in the project root.
 Image-only (scanned) PDFs are not supported in this version.
 
 OCR requires an external engine (e.g., Tesseract) and is intentionally not included to keep the project dependency-free.
+
+Requirements
 ```nginx
- requirements.txt
 pymupdf
 pypdf
 tqdm
