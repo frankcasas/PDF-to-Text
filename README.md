@@ -31,8 +31,8 @@ A production-ready Python CLI tool that recursively converts PDF files in a dire
 Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/pdf-to-text.git
-cd pdf-to-text
+git clone https://github.com/frankcasas/PDF-to-Text.git
+cd PDF-to-Text
 ```
 Install dependencies:
 ```bash
